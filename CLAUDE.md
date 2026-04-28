@@ -154,11 +154,12 @@ CREATE VIRTUAL TABLE items_fts USING fts5(
 
 ```
 메모리: DRAM, SRAM, NAND, NOR, HBM, GDDR, LPDDR
-공정/소자: FinFET, GAA, EUV, lithography, etching, CMP, doping
+공정/소자: FinFET, GAA, CMOS, EUV, lithography, etching, CMP, doping
 설계: RTL, verification, DFT, timing, power, layout
 인터페이스: PCIe, CXL, DDR, SerDes, AXI
 SW 관점: firmware, driver, kernel, compiler
 일반: reliability, yield, packaging, testing, EDA
+시스템/응용: GPU, AI 가속기
 한국어: 기초개념, 튜토리얼, 심화, 논문, 백서
 ```
 
