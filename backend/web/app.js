@@ -4,33 +4,52 @@ const $feed = document.getElementById('feed');
 const $tagCloud = document.getElementById('tag-cloud');
 const $empty = document.getElementById('empty');
 
-let currentItems = [];
-let activeTag = null;
+let allItems = [];        // 전체 자료 (태그 클라우드의 원천 — 고정)
+let displayedItems = [];  // 피드에 표시할 자료 (필터 결과)
+let activeTag = null;     // 현재 활성화된 태그 필터 (클라이언트 측)
+let searchQuery = '';     // 현재 검색어 (서버 FTS5)
 
-async function load(query) {
+async function loadAll() {
   $feed.innerHTML = '<div class="loading">로딩 중...</div>';
   $empty.classList.add('hidden');
   try {
-    const path = query
-      ? `/items/search?q=${encodeURIComponent(query)}`
-      : '/items?limit=200';
-    const res = await fetch(path);
-    if (!res.ok) {
-      let msg = `HTTP ${res.status}`;
-      try {
-        const j = await res.json();
-        if (j.error) msg += ` — ${j.error}`;
-      } catch {}
-      throw new Error(msg);
-    }
-    currentItems = await res.json();
-    render();
+    const res = await fetch('/items?limit=200');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allItems = await res.json();
+    applyFilter();
   } catch (err) {
-    currentItems = [];
+    allItems = [];
+    displayedItems = [];
     $tagCloud.innerHTML = '';
     $feed.innerHTML = `<div class="error">불러오기 실패: ${err.message}</div>`;
-    $empty.classList.add('hidden');
   }
+}
+
+async function applyFilter() {
+  if (searchQuery) {
+    // 서버 FTS5 검색
+    try {
+      const res = await fetch(`/items/search?q=${encodeURIComponent(searchQuery)}`);
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try { const j = await res.json(); if (j.error) msg += ` — ${j.error}`; } catch {}
+        throw new Error(msg);
+      }
+      displayedItems = await res.json();
+    } catch (err) {
+      displayedItems = [];
+      renderTagCloud();
+      $feed.innerHTML = `<div class="error">검색 실패: ${err.message}</div>`;
+      $empty.classList.add('hidden');
+      return;
+    }
+  } else if (activeTag) {
+    // 태그 필터 — 클라이언트 측 정확 일치 (네트워크 X)
+    displayedItems = allItems.filter((i) => (i.tags || []).includes(activeTag));
+  } else {
+    displayedItems = allItems;
+  }
+  render();
 }
 
 function render() {
@@ -39,11 +58,14 @@ function render() {
 }
 
 function renderTagCloud() {
+  // 항상 allItems 기준 — 필터/검색에 영향받지 않음
   const counts = new Map();
-  for (const item of currentItems) {
+  for (const item of allItems) {
     for (const t of item.tags || []) counts.set(t, (counts.get(t) || 0) + 1);
   }
-  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const sorted = [...counts.entries()].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+  );
   $tagCloud.innerHTML = '';
   for (const [tag, n] of sorted) {
     const el = document.createElement('span');
@@ -55,19 +77,19 @@ function renderTagCloud() {
     cnt.textContent = n;
     el.appendChild(label);
     el.appendChild(cnt);
-    el.addEventListener('click', () => filterByTag(tag));
+    el.addEventListener('click', () => toggleTag(tag));
     $tagCloud.appendChild(el);
   }
 }
 
 function renderFeed() {
   $feed.innerHTML = '';
-  if (currentItems.length === 0) {
+  if (displayedItems.length === 0) {
     $empty.classList.remove('hidden');
     return;
   }
   $empty.classList.add('hidden');
-  for (const item of currentItems) {
+  for (const item of displayedItems) {
     $feed.appendChild(renderCard(item));
   }
 }
@@ -108,7 +130,7 @@ function renderCard(item) {
     tagEl.className = 'tag';
     tagEl.textContent = t;
     tagEl.title = `"${t}" 태그 필터`;
-    tagEl.addEventListener('click', () => filterByTag(t));
+    tagEl.addEventListener('click', () => toggleTag(t));
     meta.appendChild(tagEl);
   }
 
@@ -128,16 +150,17 @@ function renderCard(item) {
   return card;
 }
 
-function filterByTag(tag) {
+function toggleTag(tag) {
   if (activeTag === tag) {
+    // 같은 태그 다시 클릭 → 해제
     activeTag = null;
-    $q.value = '';
-    load();
   } else {
+    // 다른 태그 → 활성화 (검색은 해제)
     activeTag = tag;
-    $q.value = tag;
-    load(tag);
+    searchQuery = '';
+    $q.value = '';
   }
+  applyFilter();
 }
 
 async function deleteItem(id, title) {
@@ -146,8 +169,8 @@ async function deleteItem(id, title) {
   try {
     const res = await fetch(`/items/${id}`, { method: 'DELETE' });
     if (res.status !== 204 && !res.ok) throw new Error(`HTTP ${res.status}`);
-    const q = $q.value.trim();
-    load(q || null);
+    // 삭제는 전체 자료에 영향 → 클라우드 갱신 위해 allItems 재로드
+    loadAll();
   } catch (err) {
     alert(`삭제 실패: ${err.message}`);
   }
@@ -164,7 +187,6 @@ function displayUrl(u) {
 
 function formatDate(s) {
   if (!s) return '';
-  // SQLite "YYYY-MM-DD HH:MM:SS" → "YYYY-MM-DD HH:MM"
   return s.slice(0, 16);
 }
 
@@ -180,16 +202,18 @@ $q.addEventListener(
   'input',
   debounce((e) => {
     const v = e.target.value.trim();
-    activeTag = null; // 검색어 직접 입력 시 태그 활성 해제 (재렌더 시 active 표시 갱신)
-    load(v || null);
+    searchQuery = v;
+    if (v) activeTag = null; // 검색 입력 시 태그 필터 해제
+    applyFilter();
   }, 250)
 );
 
 $clear.addEventListener('click', () => {
   $q.value = '';
+  searchQuery = '';
   activeTag = null;
-  load();
+  applyFilter();
   $q.focus();
 });
 
-load();
+loadAll();
