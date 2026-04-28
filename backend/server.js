@@ -22,12 +22,25 @@ app.get('/health', (req, res) => {
   res.json({ ok: true });
 });
 
+// URL 정규화: fragment(#앵커) 제거. 같은 페이지의 섹션 링크가 별도 자료로 저장되는 것 방지.
+// 추적 파라미터(utm_*) 등 query 정규화는 사이트마다 의미가 달라(query로 콘텐츠 식별하는 사이트도 있음) MVP에서는 손대지 않음.
+function normalizeUrl(input) {
+  try {
+    const u = new URL(input);
+    u.hash = '';
+    return u.toString();
+  } catch {
+    return input;
+  }
+}
+
 app.post('/items', async (req, res) => {
   try {
-    const { url } = req.body || {};
-    if (!url || typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
+    const raw = req.body && req.body.url;
+    if (!raw || typeof raw !== 'string' || !/^https?:\/\//i.test(raw)) {
       return res.status(400).json({ error: 'http(s) URL이 필요합니다' });
     }
+    const url = normalizeUrl(raw);
 
     const existing = db.getItemByUrl(url);
     if (existing) {
