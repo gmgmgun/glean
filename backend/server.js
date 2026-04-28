@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
@@ -17,6 +18,9 @@ if (!process.env.ANTHROPIC_API_KEY) {
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '256kb' }));
+
+// 정적 웹 UI (Phase 3): localhost:3001/ → web/index.html
+app.use(express.static(path.join(__dirname, 'web')));
 
 app.get('/health', (req, res) => {
   res.json({ ok: true });

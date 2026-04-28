@@ -1,0 +1,244 @@
+:root {
+  --teal: #0f766e;
+  --teal-dark: #0d5d56;
+  --bg: #fafaf9;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --border-soft: #f1f5f9;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --chip-bg: #f3f4f6;
+  --chip-bg-hover: #e5e7eb;
+  --error-bg: #fef2f2;
+  --error-text: #b91c1c;
+  --error-border: #fecaca;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--teal); }
+a:hover { color: var(--teal-dark); }
+
+/* ===== Header ===== */
+header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 18px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--teal);
+  letter-spacing: -0.3px;
+  font-weight: 700;
+}
+header .hint {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.search-row {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+.search-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+}
+.search-row input:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+  border-color: var(--teal);
+  background: #fff;
+}
+.search-row button {
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+}
+.search-row button:hover {
+  background: var(--chip-bg);
+  color: var(--text);
+}
+
+/* ===== Tag cloud ===== */
+.tag-cloud {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 24px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.tag-cloud:empty { display: none; }
+.tag-cloud .tag {
+  background: var(--chip-bg);
+  color: var(--text);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s, color 0.1s;
+  user-select: none;
+}
+.tag-cloud .tag:hover { background: var(--chip-bg-hover); }
+.tag-cloud .tag.active {
+  background: var(--teal);
+  color: #fff;
+}
+.tag-cloud .tag .count {
+  opacity: 0.6;
+  margin-left: 4px;
+  font-size: 11px;
+}
+
+/* ===== Feed ===== */
+main {
+  max-width: 800px;
+  margin: 20px auto 60px;
+  padding: 0 24px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  transition: border-color 0.1s;
+}
+.card:hover { border-color: #d1d5db; }
+
+.card .title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.card .title a {
+  color: var(--text);
+  text-decoration: none;
+}
+.card .title a:hover {
+  color: var(--teal);
+  text-decoration: underline;
+}
+.card .url {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card .summary {
+  color: var(--text);
+  margin: 8px 0;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.card .meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.card .meta .tag {
+  background: var(--chip-bg);
+  color: var(--text);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+}
+.card .meta .tag:hover { background: var(--chip-bg-hover); }
+.card .meta .date {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.card .meta .delete {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.card .meta .delete:hover {
+  color: var(--error-text);
+  background: var(--error-bg);
+}
+
+/* ===== Empty / Error ===== */
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+  font-size: 13px;
+}
+.hidden { display: none; }
+.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--error-border);
+  margin: 12px 0;
+  font-size: 13px;
+}
+.loading {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px 0;
+  font-size: 13px;
+}
+.summary-line {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 12px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}

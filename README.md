@@ -13,13 +13,13 @@
 
 ## 현재 단계
 
-**Phase 2: 크롬 익스텐션 동작 가능**
+**Phase 3: 검색·열람 웹 UI 동작 가능**
 
 | Phase | 내용 | 상태 |
 |---|---|---|
 | 1 | Node + Express + SQLite + Claude API 백엔드 | 완료 |
 | 2 | 크롬 익스텐션 (우클릭/단축키 저장) | 완료 |
-| 3 | 검색·열람 웹 UI | 예정 |
+| 3 | 검색·열람 웹 UI | 완료 |
 | 4 | 시맨틱 검색 (`sqlite-vec` + 임베딩) | 예정 |
 
 ## 기술 스택
@@ -43,7 +43,8 @@ npm run dev
 
 서버는 `http://localhost:3001` 에서 동작 (포트 변경은 `.env`의 `PORT`).
 
-크롬 익스텐션 설치는 [extension/README.md](./extension/README.md) 참조.
+- **웹 UI**: 브라우저에서 `http://localhost:3001/` 열기 → 자료 피드 + 태그 필터 + 검색
+- **크롬 익스텐션**: 페이지 우클릭 또는 `Ctrl+Shift+G` 로 한 번에 저장 ([설치 가이드](./extension/README.md))
 
 ```bash
 # 자료 저장
@@ -77,11 +78,15 @@ glean/
 ├── CLAUDE.md             # AI 어시스턴트용 컨텍스트 (설계 문서 겸용)
 ├── README.md
 ├── backend/              # Phase 1 (완료)
-│   ├── server.js         # Express 라우팅
+│   ├── server.js         # Express 라우팅 + 정적 서빙
 │   ├── db.js             # SQLite + FTS5
 │   ├── llm.js            # Claude 호출 (요약·태깅)
 │   ├── fetcher.js        # 웹페이지 본문 추출
-│   └── data.db           # 자동 생성 (Git 제외)
+│   ├── data.db           # 자동 생성 (Git 제외)
+│   └── web/              # Phase 3 (완료) — 검색·열람 웹 UI
+│       ├── index.html
+│       ├── style.css
+│       └── app.js        # vanilla JS (프레임워크/빌드 없음)
 └── extension/            # Phase 2 (완료) — 크롬 MV3 익스텐션
     ├── manifest.json
     ├── background.js     # 컨텍스트 메뉴 + 단축키 + 토스트 주입

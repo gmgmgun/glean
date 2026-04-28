@@ -65,22 +65,24 @@
 ## 디렉터리 구조
 
 ```
-my-curator/
-└── backend/
-    ├── package.json
-    ├── .env              # API 키 (Git에 절대 커밋 금지)
-    ├── .gitignore
-    ├── server.js         # Express 라우팅
-    ├── db.js             # SQLite 래퍼
-    ├── llm.js            # Claude API 호출 (요약·태깅)
-    ├── fetcher.js        # 웹페이지 본문 추출
-    └── data.db           # SQLite 파일 (자동 생성, Git 제외)
-```
-
-향후 추가 예정:
-```
-├── extension/            # 크롬 익스텐션 (Phase 2)
-└── web/                  # 검색·열람용 웹 UI (Phase 3, 선택)
+glean/
+├── backend/                  # Phase 1 + Phase 3 정적 서빙
+│   ├── package.json
+│   ├── .env                  # API 키 (Git에 절대 커밋 금지)
+│   ├── server.js             # Express 라우팅 + web/ 정적 서빙
+│   ├── db.js                 # SQLite 래퍼
+│   ├── llm.js                # Claude API 호출 (요약·태깅)
+│   ├── fetcher.js            # 웹페이지 본문 추출
+│   ├── data.db               # SQLite 파일 (자동 생성, Git 제외)
+│   └── web/                  # Phase 3 — 검색·열람 웹 UI (vanilla JS)
+│       ├── index.html
+│       ├── style.css
+│       └── app.js
+└── extension/                # Phase 2 — 크롬 MV3 익스텐션
+    ├── manifest.json
+    ├── background.js
+    ├── options.html
+    └── options.js
 ```
 
 ---

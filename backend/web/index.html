@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>glean</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>glean</h1>
+        <p class="hint">반도체 도메인 학습 자료 큐레이션</p>
+      </div>
+      <div class="search-row">
+        <input type="search" id="q" placeholder="검색 (예: DRAM, EUV, 기초개념)" autocomplete="off" />
+        <button id="clear" title="지우기">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <section id="tag-cloud" class="tag-cloud" aria-label="태그 필터"></section>
+
+  <main id="feed" aria-live="polite"></main>
+  <div id="empty" class="empty hidden">자료 없음</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
