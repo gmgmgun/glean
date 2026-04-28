@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "glean",
+  "version": "0.1.0",
+  "description": "현재 페이지를 glean 백엔드에 저장 (반도체 도메인 학습 큐레이션)",
+  "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
+  "host_permissions": [
+    "http://localhost:*/*",
+    "http://127.0.0.1:*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "save-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "현재 페이지를 glean에 저장"
+    }
+  }
+}

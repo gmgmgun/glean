@@ -13,12 +13,12 @@
 
 ## 현재 단계
 
-**Phase 1: MVP 백엔드 개발 중**
+**Phase 2: 크롬 익스텐션 동작 가능**
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| 1 | Node + Express + SQLite + Claude API 백엔드 | 진행 중 |
-| 2 | 크롬 익스텐션 (우클릭/단축키 저장) | 예정 |
+| 1 | Node + Express + SQLite + Claude API 백엔드 | 완료 |
+| 2 | 크롬 익스텐션 (우클릭/단축키 저장) | 완료 |
 | 3 | 검색·열람 웹 UI | 예정 |
 | 4 | 시맨틱 검색 (`sqlite-vec` + 임베딩) | 예정 |
 
@@ -41,7 +41,9 @@ cp .env.example .env   # ANTHROPIC_API_KEY 채우기
 npm run dev
 ```
 
-서버는 `http://localhost:3000` 에서 동작.
+서버는 `http://localhost:3001` 에서 동작 (포트 변경은 `.env`의 `PORT`).
+
+크롬 익스텐션 설치는 [extension/README.md](./extension/README.md) 참조.
 
 ```bash
 # 자료 저장
@@ -71,15 +73,20 @@ curl "http://localhost:3000/items/search?q=DRAM"
 ## 디렉터리 구조
 
 ```
-my-curator/
-├── CLAUDE.md         # AI 어시스턴트용 컨텍스트 (설계 문서 겸용)
+glean/
+├── CLAUDE.md             # AI 어시스턴트용 컨텍스트 (설계 문서 겸용)
 ├── README.md
-└── backend/          # Phase 1
-    ├── server.js     # Express 라우팅
-    ├── db.js         # SQLite + FTS5
-    ├── llm.js        # Claude 호출 (요약·태깅)
-    ├── fetcher.js    # 웹페이지 본문 추출
-    └── data.db       # 자동 생성 (Git 제외)
+├── backend/              # Phase 1 (완료)
+│   ├── server.js         # Express 라우팅
+│   ├── db.js             # SQLite + FTS5
+│   ├── llm.js            # Claude 호출 (요약·태깅)
+│   ├── fetcher.js        # 웹페이지 본문 추출
+│   └── data.db           # 자동 생성 (Git 제외)
+└── extension/            # Phase 2 (완료) — 크롬 MV3 익스텐션
+    ├── manifest.json
+    ├── background.js     # 컨텍스트 메뉴 + 단축키 + 토스트 주입
+    ├── options.html
+    └── options.js
 ```
 
 ## 라이선스
