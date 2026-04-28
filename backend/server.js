@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 
 const db = require('./db');
-const { fetchPage } = require('./fetcher');
+const { fetchPage, extractYouTubeId } = require('./fetcher');
 const { summarizeAndTag } = require('./llm');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -27,9 +27,12 @@ app.get('/health', (req, res) => {
 });
 
 // URL 정규화: fragment(#앵커) 제거. 같은 페이지의 섹션 링크가 별도 자료로 저장되는 것 방지.
-// 추적 파라미터(utm_*) 등 query 정규화는 사이트마다 의미가 달라(query로 콘텐츠 식별하는 사이트도 있음) MVP에서는 손대지 않음.
+// YouTube는 canonical 형식(www.youtube.com/watch?v=ID)으로 통일 → youtu.be, shorts, ?t=, &list= 등 변형 모두 같은 영상으로 dedup.
+// 추적 파라미터(utm_*) 등 일반 query 정규화는 사이트마다 의미가 달라(query로 콘텐츠 식별하는 사이트도 있음) MVP에서는 손대지 않음.
 function normalizeUrl(input) {
   try {
+    const ytId = extractYouTubeId(input);
+    if (ytId) return `https://www.youtube.com/watch?v=${ytId}`;
     const u = new URL(input);
     u.hash = '';
     return u.toString();
